@@ -64,17 +64,19 @@ const buildTodayWords = async (collectionName: string, limit: number) => {
 }
 
 const recountHistory = (currentDate: string, beforeDate: string) => {
-    console.log('funcs -> recountHistory')
-    // 后续需要过滤掉已经学习过的单词 
-    let history = JSON.parse(localStorage.getItem('history')!)
-    Object.keys(history).forEach((w) => {
-        const t1 = new Date(currentDate)
-        const t2 = new Date(beforeDate)
-        const passedDays = Math.floor((t1.getTime() - t2.getTime()) / 1000 / 60 / 60 / 24)
-        console.log(`word:${w} ,passed days ${passedDays}`)
-        history[w] = history[w] - passedDays < 0 ? 0 : history[w] - passedDays
-    })
-    localStorage.setItem('history', JSON.stringify(history))
+    if (currentDate > beforeDate) {
+        console.log('funcs -> recountHistory')
+        // 后续需要过滤掉已经学习过的单词 
+        let history = JSON.parse(localStorage.getItem('history')!)
+        Object.keys(history).forEach((w) => {
+            const t1 = new Date(currentDate)
+            const t2 = new Date(beforeDate)
+            const passedDays = Math.floor((t1.getTime() - t2.getTime()) / 1000 / 60 / 60 / 24)
+            console.log(`word:${w} ,passed days ${passedDays}`)
+            history[w] = history[w] - passedDays < 0 ? 0 : history[w] - passedDays
+        })
+        localStorage.setItem('history', JSON.stringify(history))
+    }
 
 
 }

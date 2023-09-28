@@ -32,12 +32,15 @@ const getTodayWordsList = async () => {
   //   获取当前日期，与缓存日期比对，当不一致时，刷新单词。
   let currentDate = getDateText();
   console.log('WordList -> getTodayWordsList', currentDate)
+
   let beforeDate = localStorage.getItem('currentDate');
-  if (!beforeDate) {
-    localStorage.setItem('currentDate', currentDate);
-    beforeDate = currentDate
-  }
+
   if (currentDate != beforeDate) {
+    if (!beforeDate) {
+      localStorage.setItem('currentDate', currentDate);
+      beforeDate = currentDate
+    }
+
     recountHistory(currentDate, beforeDate)
     const words = await buildTodayWords(config.collectionName, config.wordsLimit)
     localStorage.setItem('todayWords', JSON.stringify(words));
