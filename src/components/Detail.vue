@@ -1,9 +1,12 @@
 <script setup lang="ts">
 
 import { ref, watch, onBeforeMount } from 'vue'
+
+import md5 from 'crypto-js/md5'
+
 import axios from 'axios';
 import Loading from '../components/Loading.vue'
-import { req,apiBaseUrl } from "../funcs";
+import { req,apiBaseUrl } from "../funcs"
 import Back from './Back.vue'
 import Mark from './Mark.vue'
 
@@ -75,7 +78,8 @@ const playAudio = async (src: string) => {
 
 
 const playVoice = async (s: string) => {
-  playAudio(`${apiBaseUrl}/voice?s=${s}`)
+  // playAudio(`${apiBaseUrl}/voice?s=${s}`)
+  playAudio(`${apiBaseUrl}/voice?key=${md5(s)}`)
 };
 
 onBeforeMount(() => {
