@@ -2,9 +2,20 @@
 const apiBaseUrl = 'https://api.words.imhcg.cn'
 
 const req = async (url: string) => {
-    const resp = await fetch(url)
+    const resp = await fetch(url, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+            "x-api-code": String(localStorage.getItem("x-api-code")),
+        }
+    })
     if (resp.status != 200) {
-        alert(`sorry\nerror code ${resp.status}`)
+        if (resp.status >= 400 && resp.status < 500) {
+            location.assign("/#/");
+        }
+        else {
+            alert(`sorry\nerror code ${resp.status}`)
+        }
         return null
     } else {
         return await resp.json()

@@ -53,10 +53,15 @@ const getDetail = async (word: string) => {
 let objectURL: string = '';
 const getBlobUrl = async (url: string) => {
   loadingVision.value = true
-  const response1 = await axios.get(url, { responseType: 'blob' });
+  const response1 = await axios.get(url, { 
+    responseType: 'blob',
+    headers:{
+      "x-api-code": String(localStorage.getItem("x-api-code"))
+    }
+  })
   loadingVision.value = false
 
-  const blob = new Blob([response1.data], { type: 'audio/mpeg' });
+  const blob = new Blob([response1.data], { type: 'audio/mpeg' })
   if (objectURL) {
     window.URL.revokeObjectURL(objectURL);
   }
@@ -164,6 +169,7 @@ watch(props, () => {
 
 .useage-en {
   font-size: 1rem;
+  cursor: pointer;
 }
 .useage-type {
   font-size: 0.9rem;
