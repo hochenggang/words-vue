@@ -58,7 +58,7 @@ onBeforeMount(async () => {
 
 <template>
   <ul v-if="todayWordsList" class="bar words">
-    <li @click="showWord(word)" v-for="(word, index) in todayWordsList">
+    <li @click="showWord(word)" v-for="(word, index) in todayWordsList" :key="index">
       <span class="word-text">{{ word }}</span>
       <span class="word-index">{{ index + 1 }}</span>
     </li>

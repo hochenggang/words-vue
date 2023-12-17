@@ -107,7 +107,7 @@ watch(props, () => {
       <h1>{{ detail.word }}</h1>
       <h4>{{ '⭐'.repeat(detail.star) }}</h4>
       <ul class="pronounce">
-        <li v-for="i in detail.pron">
+        <li v-for="i in detail.pron" >
           <span class="link" v-for="n in i" v-on:click="playAudio(`${apiBaseUrl}/static/` + n[0])">/{{
             n[1] || detail.word
           }}</span>
