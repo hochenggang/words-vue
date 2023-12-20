@@ -1,10 +1,9 @@
 <script setup lang="ts">
 
 import { ref, watch, onBeforeMount } from 'vue'
-import { getWordsCololection, buildTodayWords, recountHistory } from "../funcs";
+import { getWordsCololection, buildTodayWords, recountHistory,addWordsFrequence } from "../funcs";
 const emit = defineEmits<{
   (e: 'showWord', w: string): void,
-
 }>()
 
 const showWord = (w: string) => {
@@ -25,7 +24,7 @@ const getDateText = () => {
   return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
 }
 
-const todayWordsList = ref<string[]>()
+const todayWordsList = ref<[string,string][]>()
 
 const getTodayWordsList = async () => {
 
@@ -35,7 +34,7 @@ const getTodayWordsList = async () => {
 
   let beforeDate = localStorage.getItem('currentDate');
 
-  if (currentDate != beforeDate) {
+  if (currentDate != beforeDate || !localStorage.getItem('todayWords')) {
     if (!beforeDate) {
       localStorage.setItem('currentDate', currentDate);
       beforeDate = currentDate
@@ -43,6 +42,7 @@ const getTodayWordsList = async () => {
 
     recountHistory(currentDate, beforeDate)
     const words = await buildTodayWords(config.collectionName, config.wordsLimit)
+    
     localStorage.setItem('todayWords', JSON.stringify(words));
     localStorage.setItem('currentDate', currentDate);
   };
@@ -57,10 +57,13 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <ul v-if="todayWordsList" class="bar words">
-    <li @click="showWord(word)" v-for="(word, index) in todayWordsList" :key="index">
-      <span class="word-text">{{ word }}</span>
-      <span class="word-index">{{ index + 1 }}</span>
+  <ul v-if="todayWordsList" class="words">
+    <li @click="showWord(word[0])" v-for="(word, index) in todayWordsList" :key="index">
+      <div class="word">
+        <span class="word-text">{{ word[0] }}</span>
+        <span class="word-detail">{{ word[1].length > 25 ? word[1].slice(0, 25)+"...":word[1] }}</span>
+      </div>
+      <!-- <span class="word-index">{{ index + 1 }}</span> -->
     </li>
   </ul>
   <ul v-if="!todayWordsList?.length" class="bar words flex-center">
@@ -85,7 +88,7 @@ onBeforeMount(async () => {
   justify-content: start;
 }
 
-.words li {
+.word {
   border-bottom: 1px solid var(--color-line2);
   cursor: pointer;
   width: 100%;
@@ -102,7 +105,7 @@ onBeforeMount(async () => {
 
 }
 
-.word-index {
+.word-detail {
   display: inline-block;
   font-size: 0.75rem;
   color: var(--color-text4);

@@ -31,12 +31,11 @@ interface Config {
 }
 
 
-
 const getConfigCache = () => JSON.parse(localStorage.getItem('config')!) as Config
 
 
 const getWordsCololection = async (collectionName: string) => {
-    let r = localStorage.getItem(`words->${collectionName}`)
+    const r = localStorage.getItem(`words->${collectionName}`);
     if (!r) {
         const resp = await req(`${apiBaseUrl}/static/collection/${collectionName}.json`)
         if (resp) {
@@ -51,27 +50,29 @@ const getWordsCololection = async (collectionName: string) => {
 
 const buildTodayWords = async (collectionName: string, limit: number) => {
     console.log('funcs -> buildTodayWords', collectionName, limit)
-    const a = await getWordsCololection(collectionName)
-    let b: string[] = a
-    if (getConfigCache().random) {
-        b = a.sort(() => Math.random() - 0.5);
-    }
-    if (b.length < limit) {
-        limit = b.length
-    }
-    console.log('words list:', b)
-
-    // 后续需要过滤掉已经学习过的单词 
+    let a = await getWordsCololection(collectionName) as string[]
+    // 需要过滤掉已经学习过的单词 
     const history = JSON.parse(localStorage.getItem('history')!)
-    b.forEach((item: string, index: number, arr: string[]) => {
+    a.forEach((item: string, index: number, arr: string[]) => {
         if (history[item] && history[item] > 0) {
-            debugger
             arr.splice(index, 1);
         }
     });
-    console.log('deleted studyed words list:', b)
 
-    return b.slice(0, limit)
+    if (a.length < limit) {
+        limit = a.length
+    }
+
+    let b: [string,string][] = []
+    if (getConfigCache().random) {
+        a = a.sort(() => Math.random() - 0.5)
+    }
+    a.slice(0, limit).forEach((item: string) => {
+        b.push([item,""])
+    })
+    const wordsWithFrequence = await addWordsFrequence(b)
+    console.log("buildTodayWords",b,wordsWithFrequence)
+    return wordsWithFrequence
 }
 
 const recountHistory = (currentDate: string, beforeDate: string) => {
@@ -95,6 +96,27 @@ const recountHistory = (currentDate: string, beforeDate: string) => {
 
 const getWordCololectionsNameList = async () => await req(`${apiBaseUrl}/static/collection/names.json`)
 
+
+const addWordsFrequence = async (words: [string,string][]) => {
+        let queryWords = ""
+        words.forEach((w)=>{
+
+            if (queryWords.length == 0){
+                queryWords +=  w[0]
+            }else{
+                queryWords +=  "," + w[0]
+            }
+        })
+        const resp = await req(`${apiBaseUrl}/db/frequence?words=${queryWords}`) as string[]
+        if (resp) {
+            console.log('getWordsFrequence',queryWords,resp)
+            resp.forEach((useages,index)=>{
+                words[index] = [words[index][0],useages]
+            })
+        }
+        return words
+}
+
 export {
     apiBaseUrl,
     req,
@@ -103,6 +125,7 @@ export {
     getWordCololectionsNameList,
     getConfigCache,
     recountHistory,
+    addWordsFrequence,
 }
 
 export type {
