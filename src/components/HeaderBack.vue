@@ -1,6 +1,5 @@
 <script setup lang="ts">
 
-import { ref, watch } from 'vue'
 
 const props = defineProps<{
   loading: boolean
@@ -12,7 +11,6 @@ const emit = defineEmits<{
 
 const back = () => {
   console.log('Back -> back')
-
   emit('back')
 }
 
@@ -40,8 +38,6 @@ const back = () => {
         </svg>
       </span>
     </Transition>
-
-
   </div>
 </template>
 

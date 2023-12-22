@@ -75,11 +75,19 @@ import { RouterView } from 'vue-router'
   stroke-width: 2px;
 }
 
-.icon-box {
+.flex-center {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
+svg {
+  width: 1rem;
+  height: 1rem;
+  display: block;
+}
+
+
 .v-enter-active,
 .v-leave-active {
   transition: 0.3s ease;
@@ -89,4 +97,5 @@ import { RouterView } from 'vue-router'
 .v-leave-to {
   opacity: 0;
 }
+
 </style>

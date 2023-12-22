@@ -1,45 +1,24 @@
 <script setup lang="ts">
 
-import { ref, watch, onBeforeMount } from 'vue'
-import { getWordsCololection, buildTodayWords, recountHistory,addWordsFrequence } from "../funcs";
-const emit = defineEmits<{
-  (e: 'showWord', w: string): void,
-}>()
+import { ref, onBeforeMount } from 'vue'
+import { useRouter } from "vue-router";
+import { buildTodayWords,getConfigCache,getDateString,recountHistory } from "../funcs";
+import type { TypeTodayWords } from "../funcs";
 
-const showWord = (w: string) => {
-  emit('showWord', w)
-}
+const router = useRouter();
 
-interface Config {
-  collectionName: string,
-  wordsLimit: number,
-  sortType: string,
-  autoNext: boolean
-}
-
-let config: Config = JSON.parse(localStorage.getItem('config')!)
-
-const getDateText = () => {
-  const d = new Date();
-  return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
-}
-
-const todayWordsList = ref<[string,string][]>()
+let config = getConfigCache()
+const todayWordsList = ref<TypeTodayWords>()
 
 const getTodayWordsList = async () => {
-
-  //   获取当前日期，与缓存日期比对，当不一致时，刷新单词。
-  let currentDate = getDateText();
-  console.log('WordList -> getTodayWordsList', currentDate)
-
+  // if this component load at same day, not rebuid words
+  let currentDate = getDateString();
   let beforeDate = localStorage.getItem('currentDate');
-
   if (currentDate != beforeDate || !localStorage.getItem('todayWords')) {
     if (!beforeDate) {
       localStorage.setItem('currentDate', currentDate);
       beforeDate = currentDate
     }
-
     recountHistory(currentDate, beforeDate)
     const words = await buildTodayWords(config.collectionName, config.wordsLimit)
     
@@ -49,6 +28,7 @@ const getTodayWordsList = async () => {
   todayWordsList.value = JSON.parse(localStorage.getItem('todayWords')!);
 }
 
+const toDetailPage = (word:string)=>router.push(`/detail?word=${word}`)
 
 onBeforeMount(async () => {
   getTodayWordsList()
@@ -58,12 +38,11 @@ onBeforeMount(async () => {
 
 <template>
   <ul v-if="todayWordsList" class="words">
-    <li @click="showWord(word[0])" v-for="(word, index) in todayWordsList" :key="index">
+    <li @click="toDetailPage(word[0])" v-for="(word, index) in todayWordsList" :key="index">
       <div class="word">
         <span class="word-text">{{ word[0] }}</span>
-        <span class="word-detail">{{ word[1].length > 25 ? word[1].slice(0, 25)+"...":word[1] }}</span>
+        <span class="word-detail">{{ word[1].split("，").length > 2 ? word[1].split("，").slice(0,2).join(", ") : word[1].split("，").join(", ")}}</span>
       </div>
-      <!-- <span class="word-index">{{ index + 1 }}</span> -->
     </li>
   </ul>
   <ul v-if="!todayWordsList?.length" class="bar words flex-center">
@@ -78,7 +57,8 @@ onBeforeMount(async () => {
 
 <style scoped>
 .words {
-  padding: 4.5rem 1rem;
+  padding: 1.75rem;
+  padding-top: 5rem;
   z-index: 2;
   margin: 0;
   width: 100%;
@@ -95,7 +75,7 @@ onBeforeMount(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 0rem;
   border-radius: 0;
 
 }
@@ -107,8 +87,8 @@ onBeforeMount(async () => {
 
 .word-detail {
   display: inline-block;
-  font-size: 0.75rem;
-  color: var(--color-text4);
+  font-size: 0.8rem;
+  color: var(--color-text2);
   font-weight: lighter;
 }
 

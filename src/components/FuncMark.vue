@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref, watch } from 'vue'
+import type { TypeTodayWords } from '../funcs'
 
 const props = defineProps<{
   word: string
@@ -13,9 +13,9 @@ const emits = defineEmits<{
 
 const markWord = (score: number) => {
   console.log('Mark -> ', props.word, score)
-  let words = JSON.parse(localStorage.getItem('todayWords')!);
-  words.forEach((item: string, index: number, arr: string[]) => {
-    if (item == props.word) {
+  let words = JSON.parse(localStorage.getItem('todayWords')!) as TypeTodayWords
+  words.forEach((item, index, arr) => {
+    if (item[0] == props.word) {
       arr.splice(index, 1);
     }
   });
