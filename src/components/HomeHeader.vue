@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeMount } from 'vue'
-import { useRouter,useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import {
   getWordCololectionsNameList,
@@ -15,7 +15,6 @@ import IconBack from './icons/IconBack.vue'
 import IconSave from './icons/IconSave.vue'
 
 
-const route = useRoute()
 const router = useRouter()
 const toDetailPage = (word: string) => router.push(`/detail?word=${word}`)
 

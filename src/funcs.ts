@@ -34,6 +34,14 @@ type TypeConfig = {
   autoNext: boolean
 }
 
+const getConfigCache = () => JSON.parse(localStorage.getItem('config')!) as TypeConfig
+
+// define the type of remote data of word collections name list, [title, count of words][]
+type TpyeWordCololectionsNameList = [string, number][]
+// return a word collections name list like [["colins 5 star",1000],...]
+const getWordCololectionsNameList = async (): Promise<TpyeWordCololectionsNameList> =>
+  await req(`${apiBaseUrl}/static/collection/names.json`)
+
 // every start , need initConfig to check if ready
 const initConfig = async () => {
   const cache = localStorage.getItem('config')
@@ -55,14 +63,6 @@ const initConfig = async () => {
     localStorage.setItem('history', JSON.stringify({}))
   }
 }
-
-const getConfigCache = () => JSON.parse(localStorage.getItem('config')!) as TypeConfig
-
-// define the type of remote data of word collections name list, [title, count of words][]
-type TpyeWordCololectionsNameList = [string, number][]
-// return a word collections name list like [["colins 5 star",1000],...]
-const getWordCololectionsNameList = async (): Promise<TpyeWordCololectionsNameList> =>
-  await req(`${apiBaseUrl}/static/collection/names.json`)
 
 type TypeWordsCololection = string[]
 const getWordsCololection = async (collectionName: string): Promise<TypeWordsCololection> => {
